@@ -1,5 +1,6 @@
 #include "VectorIterator.h"
 #include <stdexcept>
+#include <iostream>
 
 #pragma once
 
@@ -10,15 +11,30 @@ class Vector
 	size_t _capacity;
 
 public:
-	Vector() : digits(nullptr), _size(0), _capacity(0) { };
+	Vector() : digits(nullptr), _size(0), _capacity(0) 
+	{
+		/*digits = new int[1];
+		digits[0] = 0;*/
+	};
 	Vector(const Vector& vec);
 	Vector(const int* vec, size_t num);
+
+	void print()
+	{
+		for (int i : *this)
+			std::cout << i << ' ';
+		std::cout << std::endl;
+	}
 
 	size_t size() const { return _size; };
 	size_t length() const { return _size; };
 	size_t capacity() const { return _capacity - 1; };
 
-	~Vector() { delete[] digits; };
+	~Vector() 
+	{
+		if (digits != nullptr)
+			delete[] digits; 
+	};
 
 	Vector& operator=(const Vector& other);
 	VectorIterator begin() const { return VectorIterator(&digits[0]); };
@@ -53,7 +69,21 @@ public:
 	{
 		delete[] digits;
 		_size = 0;
+
+		/*digits = new int[1];
+		digits[0] = 0;*/
 	}
 
-	VectorIterator insert(const VectorIterator& it, int element);
+	VectorIterator insert(const VectorIterator& it, int&& element);
+	VectorIterator insert(const VectorIterator& it, size_t count, int&& element);
+	VectorIterator insert(const VectorIterator& _where, const VectorIterator& l_it, const VectorIterator& r_it);
+
+	VectorIterator erase(const VectorIterator& it);
+	VectorIterator erase(const VectorIterator& l_it, const VectorIterator& r_it);
+
+	void push_back(int&& element);
+	void pop_back() { _size--; };
+
+	void resize(size_t actual_size);
+	void swap(Vector& other);
 };
