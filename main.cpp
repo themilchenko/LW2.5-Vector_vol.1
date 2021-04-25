@@ -1,4 +1,4 @@
-﻿#include <algorithm>
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -7,16 +7,6 @@
 
 int main()
 {
-	std::vector<int> v;
-	v.reserve(100);
-	v.reserve(5);
-	std::cout << v.capacity() << std::endl;
-	std::cout << sizeof(v) << std::endl;
-	v.insert(v.end(), 1);
-	auto it = v.insert(v.begin(), 1000);
-	for (int i : v)
-		std::cout << i;
-	std::cout << std::endl << *it;
 
 	int* a = new int[6];
 	
@@ -46,20 +36,61 @@ int main()
 	std::cout << "The size of container is " << vec.size() << std::endl;
 
 	std::cout << "Capacity: " << vec.capacity() << std::endl;
-	vec.reserve(1000);
 	std::cout << "Capacity: " << vec.capacity() << std::endl;
-
-	for (int i : vec)
-		std::cout << i << ' ';
-	std::cout << std::endl;
-
-	vec.insert(vec.begin(), 1);
+	vec.print();
 	vec.insert(vec.begin() + 3, 999);
-	vec.clear();
+	vec.print();
 	vec.insert(vec.begin(), 876);
+	vec.print();
+	vec.insert(vec.end(), 12);
+	vec.print();
+	vec.insert(vec.end() - 1, 13);
+	vec.print();
+	auto iter = vec.insert(vec.end() - 2, 21);
+	std::cout << *iter << std::endl;
+	vec.print();
 
-	for (int i : vec)
-		std::cout << i << ' ';
+	vec.insert(vec.begin() + 5, 1, 456);
+	vec.print();
 
+	vec.clear();
+	vec.insert(vec.end(), 1);
+	vec.print();
+ 	vec.insert(vec.end(), 99);
+	vec.print();
+	Vector vec2(a, 6);
+	vec.insert(vec.begin() + 1, vec2.begin(), vec2.end());
+	vec.print();
+
+	vec2.insert(vec2.end(), vec.begin(), vec.end());
+	vec2.print();
+	vec.print();
+
+	vec.erase(vec.begin() + 5);
+	vec.print();
+
+	vec.erase(vec.begin() + 1, vec.begin() + 3);
+	vec.print();
+
+	vec.erase(vec.end() - 2, vec.end());
+	vec.print();
+
+	vec.erase(vec.begin(), vec.end());
+	vec.print();
+
+	vec.insert(vec.begin(), 5, 100);
+	vec.print();
+
+	vec.push_back(1233);
+	vec.print();
+
+	vec.pop_back();
+
+	vec.resize(10);
+	vec.print();
+
+	vec.swap(vec2);
+	vec.print();
+	vec2.print();
 	return 0;
 }
