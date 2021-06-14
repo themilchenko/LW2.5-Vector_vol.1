@@ -11,11 +11,11 @@ class Vector
 	size_t _capacity;
 
 public:
-	Vector() : digits(nullptr), _size(0), _capacity(0) 
+	Vector() : _size(0), _capacity(0) 
 	{
-		/*digits = new int[1];
-		digits[0] = 0;*/
+		digits = new int[1];
 	};
+
 	Vector(const Vector& vec);
 	Vector(const int* vec, size_t num);
 
@@ -50,8 +50,8 @@ public:
 
 	int& operator[](size_t index) { return digits[index]; };
 
-	int& front() { return *this->begin(); };
-	int& back() { return *(this->end() - 1); };
+	int& front() { return *begin(); };
+	int& back() { return *(end() - 1); };
 
 	int* data() { return digits; };
 
@@ -70,8 +70,7 @@ public:
 		delete[] digits;
 		_size = 0;
 
-		/*digits = new int[1];
-		digits[0] = 0;*/
+		digits = new int[1];
 	}
 
 	VectorIterator insert(const VectorIterator& it, int&& element);
