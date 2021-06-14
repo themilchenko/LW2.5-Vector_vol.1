@@ -14,6 +14,8 @@ Vector::Vector(const Vector& vec) : _size(vec._size), _capacity(vec._capacity)
 		digits = new int[1];
 	else
 	{
+		if (digits != nullptr)
+			delete[] digits;
 		digits = new int[_capacity];
 
 		for (int i = 0; i < _size; ++i)
@@ -46,11 +48,10 @@ void Vector::reserve(size_t num)
 	{
 		_capacity = num;
 
-		int* temp = new int[_size];
+		int* temp = new int[_capacity + 1];
 		for (size_t i = 0; i < _size; ++i)
 			temp[i] = digits[i];
-
-		delete[] digits;
+		digits = nullptr;
 		digits = temp;
 	}
 
@@ -62,88 +63,94 @@ VectorIterator Vector::insert(const VectorIterator& it, int&& element)
 
 	if (_capacity >= _size)  // если максимальная величина не превышает текущий размер
 	{
-	    int dif = std::distance(begin(), it);
+		int dif = std::distance(begin(), it);
 
-	    for (size_t i = _size; i > dif; i--)
-	        digits[i] = digits[i - 1];
+		for (size_t i = _size; i > dif; i--)
+			digits[i] = digits[i - 1];
 
-	    *it = element;
+		*it = element;
 
-	    return it;
+		return it;
 	}
 	else
 	{
-	    int dif = std::distance(begin(), it);
+		int dif = std::distance(begin(), it);
 
 		reserve(1.5 * _capacity);
 
-        for (size_t i = _size; i > dif; i--)
-            digits[i] = digits[i - 1];
+		for (size_t i = _size; i > dif; i--)
+			digits[i] = digits[i - 1];
 
-        *(begin() + dif) = element;
+		*(begin() + dif) = element;
 
-        return begin() + dif + 1;
+		return begin() + dif;
 	}
 }
 
 VectorIterator Vector::insert(const VectorIterator& it, size_t count, int&& element)
 {
 	_size += count;
-    int dif = std::distance(begin(), it);
+	int dif = std::distance(begin(), it);
 
 	if (_capacity < _size)
-        while (_capacity < _size)
-            reserve(1.5 * _capacity);
+		while (_capacity <= _size)
+			reserve(1.5 * _capacity);
 
-    for (size_t i = _size + count - 1; i > dif - 1; i--)
-        digits[i] = digits[i - count];
+	for (size_t i = _size + count - 1; i > dif - 1; i--)
+		digits[i] = digits[i - count];
 
-    for (int i = dif; i < dif + count; i++)
-        digits[i] = element;
+	for (int i = dif; i < dif + count; i++)
+		digits[i] = element;
 
-    return begin() + dif + count;
+	return begin() + dif + count;
 }
 
 VectorIterator Vector::insert(const VectorIterator& _where, const VectorIterator& l_it, const VectorIterator& r_it)
 {
-    int dif = std::distance(l_it, r_it);
-    int beg_dif = std::distance(begin(), _where);
-    VectorIterator temp_it = l_it;
-    _size += dif;
+	int dif = std::distance(l_it, r_it);
+	int beg_dif = std::distance(begin(), _where);
+	VectorIterator temp_it = l_it;
+	_size += dif;
 
-    if (_size > _capacity)
-        while (_size + dif > _capacity)
-            reserve(1.5 * _capacity);
+	if (_size > _capacity)
+		while (_size + dif >= _capacity)
+			reserve(1.5 * _capacity);
 
-    for (int i = _size + dif - 1; i > beg_dif - 1; i--)
-        digits[i] = digits[i - dif];
+	for (int i = _size + dif - 1; i > beg_dif - 1; i--)
+		digits[i] = digits[i - dif];
 
-    for (int i = beg_dif; i < beg_dif + dif; i++)
-    {
-        digits[i] = *l_it;
-        l_it;
-    }
+	for (int i = beg_dif; i < beg_dif + dif; i++)
+	{
+		digits[i] = *temp_it;
+		++temp_it;
+	}
 
-    return begin() + beg_dif;
+	return begin() + beg_dif;
 }
 
 VectorIterator Vector::erase(const VectorIterator& it)
 {
 	size_t dif = std::distance(begin(), it);
 	for (int i = dif; i < _size - 1; i++)
-	    digits[i] = digits[i + 1];
+		digits[i] = digits[i + 1];
 	_size--;
 	return begin() + dif;
 }
 
 VectorIterator Vector::erase(const VectorIterator& l_it, const VectorIterator& r_it)
 {
-	size_t dif = std::distance(l_it, r_it);
 	size_t beg_dif = std::distance(begin(), l_it);
 	size_t end_dif = std::distance(begin(), r_it);
-	for (int i = beg_dif; i < end_dif; i++)
-	    digits[i] = digits[i + dif];
-	_size -= dif;
+	size_t max_dif = std::distance(begin(), r_it);
+	size_t dif = end_dif - beg_dif + 1;
+
+	for (int i = beg_dif; i < end_dif + 1; i++)
+		digits[i] = digits[i + dif];
+
+	if (max_dif > _size - 1)
+		_size = _size - dif + 1;
+	else
+		_size -= dif;
 	return begin() + dif;
 }
 
@@ -164,30 +171,24 @@ void Vector::push_back(int&& element)
 
 void Vector::resize(size_t actual_size)
 {
-	int* temp = new int[_size];
-
-	for (size_t i = 0; i < _size; i++)
-		temp[i] = digits[i];
-
-	delete[] digits;
-	digits = new int[actual_size];
+	int* temp = new int[actual_size + 1];
 
 	if (actual_size < _size)
-		for (size_t i = 0; i < actual_size; i++)
-			digits[i] = temp[i];
+	{
+		_size = actual_size;
+		for (size_t i = 0; i < _size; i++)
+			temp[i] = digits[i];
+	}
 	else
 	{
-		for (size_t i = 0; i < _size; i++)
-			digits[i] = temp[i];
-
-		for (size_t i = _size; i < actual_size; i++)
-			digits[i] = 0;
+		for (size_t i = 0; i < _size; ++i)
+			temp[i] = digits[i];
+		for (size_t i = _size; i < actual_size; ++i)
+			temp[i] = 0;
+		_size = actual_size;
 	}
-
-	delete[] temp;
-	_size = actual_size;
-	if (_capacity < _size)
-		_capacity = _size;
+	digits = nullptr;
+	digits = temp;
 }
 
 void Vector::swap(Vector& other)
